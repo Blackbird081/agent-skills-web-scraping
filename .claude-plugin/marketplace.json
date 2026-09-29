@@ -60,6 +60,20 @@
       "version": "2.0.0"
     },
     {
+      "name": "apify-generate-output-schema",
+      "source": "./skills/apify-generate-output-schema",
+      "skills": "./",
+      "description": "Deprecated: use apify-actor-development, which now generates Actor output schemas. This plugin will be removed in a future release",
+      "keywords": [
+        "apify",
+        "actor",
+        "schema",
+        "deprecated"
+      ],
+      "category": "development",
+      "version": "3.0.0"
+    },
+    {
       "name": "apify-integration-development",
       "source": "./skills/apify-integration-development",
       "skills": "./",

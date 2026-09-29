@@ -101,6 +101,8 @@ More patterns and the full launch story in [Introducing Apify Agent Skills](http
 /plugin install apify-integration-development@apify-agent-skills
 ```
 
+`apify-generate-output-schema` is deprecated and will be removed in a future release. Its functionality is now part of `apify-actor-development`.
+
 ### Cursor and Windsurf
 
 Both editors support the Claude Code plugin format. Add this repo to your workspace settings or use the same `/plugin` flow if you have the Claude Code extension installed.

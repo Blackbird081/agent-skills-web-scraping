@@ -56,6 +56,7 @@ def collect_skills() -> list[dict[str, str]]:
                 "name": name,
                 "description": description,
                 "path": str(skill_md.parent.relative_to(ROOT)),
+                "deprecated": meta.get("deprecated", "").strip("\"'") == "true",
             }
         )
     # Keep deterministic order for consistent output
@@ -116,10 +117,12 @@ def validate_marketplace(skills: list[dict[str, str]]) -> list[str]:
 def main() -> None:
     template = load_template()
     skills = collect_skills()
-    output = render(template, skills)
+    # Deprecated skills stay installable but are not advertised to agents
+    listed = [s for s in skills if not s["deprecated"]]
+    output = render(template, listed)
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(output, encoding="utf-8")
-    print(f"Wrote {OUTPUT_PATH} with {len(skills)} skills.")
+    print(f"Wrote {OUTPUT_PATH} with {len(listed)} skills.")
 
     # Validate marketplace.json
     errors = validate_marketplace(skills)
