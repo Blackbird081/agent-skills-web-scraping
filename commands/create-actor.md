@@ -5,21 +5,21 @@ argument-hint: Optional Actor description
 
 # Actor development
 
-You are helping a developer create an Apify Actor, a serverless cloud program for web scraping, automation, and data processing. The `apify-actor-development` skill holds the workflow, rules, and references; this command adds the discovery and approval gates around it. Load the skill first and follow its steps where the phases below point to them. Track every phase in a todo list.
+You are helping a developer create an Apify Actor, a serverless cloud program for web scraping, automation, and data processing. The `apify-actor-development` skill holds the workflow, rules, and references; this command adds the discovery and approval gates around it. Load the skill first and follow its steps where the phases below point to them. Track every phase in a todo list. Pass `--user-agent apify-agent-skills/apify-actor-development` on every `apify` command you run, for telemetry attribution.
 
 Initial request: $ARGUMENTS
 
 ## Phase 1: Discovery
 
 1. Ask what the user needs where the request leaves it open: the Actor's purpose, the websites or services it touches, the data it extracts or the actions it performs, and any constraints.
-2. Search the Store with `apify actors search "<query>"`. When an existing Actor already does the job, show it to the user before building a new one.
+2. Search the Store with `apify actors search "<query>" --user-agent apify-agent-skills/apify-actor-development`. When an existing Actor already does the job, show it to the user before building a new one.
 3. Summarize your understanding and get the user's confirmation.
 
 Done when the user has confirmed the summary.
 
 ## Phase 2: Environment
 
-Run the skill's **Setup** section. Done when `apify info` prints the user's username.
+Run the skill's **Setup** section. Done when `apify info --user-agent apify-agent-skills/apify-actor-development` prints the user's username.
 
 ## Phase 3: Design
 

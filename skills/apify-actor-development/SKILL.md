@@ -16,13 +16,17 @@ apify info     # logged in? prints your username
 
 Install with a package manager, `npm install -g apify-cli` or `brew install apify-cli`, so the download is integrity-checked. Log in with `apify login`, which offers a browser sign-in or an API token prompt. In a headless environment export `APIFY_TOKEN` instead; the CLI reads it on its own. Tokens come from https://console.apify.com/settings/integrations. Pass the token only through the environment, so it stays out of shell history, source, config files, and logs.
 
+### Telemetry attribution (required)
+
+Pass `--user-agent apify-agent-skills/apify-actor-development` on **every** `apify` command you run from this skill: `apify create`, `apify run`, `apify push`, `apify call`, and the rest. It is a global flag accepted by all `apify` commands; it only tags the call for telemetry attribution and changes nothing else.
+
 ## Workflow
 
 Skip the steps that do not apply when modifying an existing Actor.
 
 1. **Create the project.**
    ```bash
-   apify create <actor-name> -t <template-id>
+   apify create <actor-name> -t <template-id> --user-agent apify-agent-skills/apify-actor-development
    ```
    Pick the template from what the Actor does:
 
@@ -37,12 +41,12 @@ Skip the steps that do not apply when modifying an existing Actor.
    For other stacks (Puppeteer, Camoufox, Scrapy, AI agent frameworks), `apify templates ls` lists every template with its language and use cases. With `-t` the command runs without prompts, which is what an agent needs. Without `-t` it prompts for name, language, template, and source host; use that form only when the user is at the terminal. Hosting the source on GitHub, GitLab, or Bitbucket makes Apify create the repository and an Actor that builds from it, so later deploys go through `git push`. Dependencies are installed for you. Done when `<name>/.actor/actor.json` exists; `cd` into it before continuing.
 2. **Add dependencies** the template lacks, such as Crawlee or Playwright: `npm install <pkg>` in JS/TS; in Python, a line in `requirements.txt` followed by `pip install -r requirements.txt`, or `uv add <pkg>` when the project has `pyproject.toml` and `uv.lock`. Check each package name against the package you mean before installing. Pin exact versions and commit the lockfile (`package-lock.json`, `uv.lock`, or `pkg==1.2.3` lines in `requirements.txt`).
 3. **Implement** in `src/main.js`, `src/main.ts`, or `my_actor/main.py` (Python templates are a `my_actor` package run as `python -m my_actor`), following the [rules](#rules). Done when the code reads every input field, produces every output field the README will describe, logs through the Apify logger, and registers an `aborting` handler that persists state and exits.
-4. **Write the input schema** in `.actor/input_schema.json` (see [references/input-schema.md](references/input-schema.md)). Done when every input the code reads has a field with title, description, type, and a default or prefill, and `apify validate-schema` passes.
+4. **Write the input schema** in `.actor/input_schema.json` (see [references/input-schema.md](references/input-schema.md)). Done when every input the code reads has a field with title, description, type, and a default or prefill, and `apify validate-schema --user-agent apify-agent-skills/apify-actor-development` passes.
 5. **Write the output schemas**: `dataset_schema.json`, `output_schema.json`, and `key_value_store_schema.json` when the code stores files. Follow [references/output-schemas.md](references/output-schemas.md) end to end; its checklist, which ends with `apify validate-schema` passing, is the completion criterion. In TypeScript, then run `apify actor generate-schema-types` and type the input and output with the generated interfaces.
 6. **Configure `.actor/actor.json`** (see [references/actor-json.md](references/actor-json.md)). Set `meta.generatedBy` to the tool and model in use, for example "Claude Code with Claude Opus 5". For an HTTP-serving Actor set `usesStandbyMode: true` (the standby templates already do) and follow [references/standby-mode.md](references/standby-mode.md).
 7. **Write README.md** following [references/actor-readme.md](references/actor-readme.md). An Actor without a README is not finished.
-8. **Test locally.** Put input in `storage/key_value_stores/default/INPUT.json`, then run `apify run`. Done when the run ends with status SUCCEEDED and `storage/datasets/default/` holds items whose fields match the dataset schema. Local storage stays on disk; nothing appears in Apify Console until step 9.
-9. **Deploy** with `apify push` once the user confirms, or `git push` for a Git-sourced Actor. Then run the Actor on the platform to see results in Console. For a Standby Actor, give the user its Standby URL (`https://<username>--<actor-name>.apify.actor`, see [references/standby-mode.md](references/standby-mode.md)) rather than pointing them to Console.
+8. **Test locally.** Put input in `storage/key_value_stores/default/INPUT.json`, then run `apify run --user-agent apify-agent-skills/apify-actor-development`. Done when the run ends with status SUCCEEDED and `storage/datasets/default/` holds items whose fields match the dataset schema. Local storage stays on disk; nothing appears in Apify Console until step 9.
+9. **Deploy** with `apify push --user-agent apify-agent-skills/apify-actor-development` once the user confirms, or `git push` for a Git-sourced Actor. Then run the Actor on the platform to see results in Console. For a Standby Actor, give the user its Standby URL (`https://<username>--<actor-name>.apify.actor`, see [references/standby-mode.md](references/standby-mode.md)) rather than pointing them to Console.
 
 ## Rules
 
@@ -74,11 +78,11 @@ Pricing is set in Apify Console when the Actor is published, not in code. Under 
 Search the Store before building from scratch; a dedicated Actor often exists.
 
 ```bash
-apify actors search "<query>"
-apify actors info <actor> --readme
-apify actors info <actor> --input
-apify call <actor> --input '{"startUrls":[{"url":"https://example.com"}]}'
-apify call <actor> --input-file input.json
+apify actors search "<query>" --user-agent apify-agent-skills/apify-actor-development
+apify actors info <actor> --readme --user-agent apify-agent-skills/apify-actor-development
+apify actors info <actor> --input --user-agent apify-agent-skills/apify-actor-development
+apify call <actor> --input '{"startUrls":[{"url":"https://example.com"}]}' --user-agent apify-agent-skills/apify-actor-development
+apify call <actor> --input-file input.json --user-agent apify-agent-skills/apify-actor-development
 ```
 
 Input is one JSON object. Quote inline JSON; use `--input-file` for anything complex.
@@ -86,6 +90,7 @@ Input is one JSON object. Quote inline JSON; use `--input-file` for anything com
 ## Less obvious commands
 
 ```bash
+# Append --user-agent apify-agent-skills/apify-actor-development to each of these too.
 apify secrets add <name> <value>   # reference from actor.json as "@name"; uploaded on push
 apify pull <actor>                 # download an Actor's code from the platform
 apify api <endpoint>               # authenticated request to the Apify API
